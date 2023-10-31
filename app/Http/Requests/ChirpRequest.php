@@ -23,10 +23,24 @@ class ChirpRequest extends FormRequest
     {
         return [
             'message' => 'required|string|max:255',
-            'image' => 'string'
+            'image' =>  'image|mimes:jpeg,png,jpg,webp|max:11000',
         ];
     }
 
+    // public function saveImage($request) 
+    // {
+    //     if($request->hasFile('upload')){
+    //         $image = base64_encode(file_get_contents($request->file('upload')));
+    //         $request->request->add(['image' => $image]); //add request
+    //     };
+    // }
+    // public function updateImage($request) 
+    // {
+    //     if($request->hasFile('upload')){
+    //         $image = ($request->file('upload'));
+    //         $request->request->add(['image' => $image]); //add request
+    //     };
+    // }
     public function payload(): array
     {
         return $this->only(['message', 'image']);

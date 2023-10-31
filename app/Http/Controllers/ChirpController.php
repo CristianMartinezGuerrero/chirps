@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\View\View;
 use App\HTTP\Controllers\LOgs;
 use App\Http\Requests\ChirpRequest;
+use Illuminate\Support\Facades\Storage;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -38,21 +39,12 @@ class ChirpController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(ChirpRequest $request): RedirectResponse
-    {
-        // $image = null;
-       if($request->hasFile('upload')){
-             $image = base64_encode(file_get_contents($request->file('upload')));
-             $request->request->add(['image' => $image]); //add request
-        };
+    {   
+        // $request->saveImage($request);
+        $path = Storage::putFile('image', $request->file('image'));
+        Storage::putFile('/public/image', $request->file('image'));
+        $request->user()->chirps()->create(['message' => $request->input('message'), 'image' => $path]);
 
-        // $validated = $request->validate([
-        //     'message' => 'required|string|max:255',
-        //     'image' => 'string'
-        // ]);
-        // dd($request->payload());
-        // Chirp::create($request->payload());
-         $request->user()->chirps()->create($request->payload());
-        // $path = $request->photo->store('images');
         return redirect(route('chirps.index'));
     }
 
@@ -79,17 +71,23 @@ class ChirpController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chirp $chirp): RedirectResponse
+    public function update(ChirpRequest $request, Chirp $chirp): RedirectResponse
     {
         $this->authorize('update', $chirp);
 
         app('log')->info("Request Captured", $request->all());
 
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
-
-        $chirp->update($validated);
+        // $validated = $request->validate([
+        //     'message' => 'required|string|max:255',
+        //     'image'  => 'string'
+        // ]);
+        // $validate = $request->payload();
+        // $request->updateImage($request);
+        // dd($request->payload());
+        // dd($chirp);
+        dd($request);
+        $chirp->update($request->payload());
+        // $chirp->update($validated);
 
         return redirect(route('chirps.index'));
     }

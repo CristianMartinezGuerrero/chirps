@@ -7,7 +7,7 @@
                 placeholder="{{ __('What\'s on your mind?') }}"
                 class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
             >{{ old('message') }}</textarea>
-            <input type="file" name="upload">
+            <input type="file" name="image">
             <x-input-error :messages="$errors->get('message')" class="mt-2" />
             <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
         </form>
@@ -56,7 +56,9 @@
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                         @if (!empty($chirp->image))
-                        <img class="w-1/4" src="data:image/*;base64, {{ $chirp->image }}" alt="">
+                        //creare funcion que devuelva url
+                        <img src="{{ asset('storage/' . $chirp->image) }}" alt="Imagen de Chirp">
+
                         @endif
                     </div>
                 </div>
