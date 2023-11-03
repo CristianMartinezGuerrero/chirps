@@ -12,8 +12,8 @@
             <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
         </form>
 
-        
-        
+
+
         <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
             @foreach ($chirps as $chirp)
                 <div class="p-6 flex space-x-2">
@@ -50,14 +50,13 @@
                                             </x-dropdown-link>
                                         </form>
                                     </x-slot>
-                                   
+
                                 </x-dropdown>
                             @endif
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                         @if (!empty($chirp->image))
-                        //creare funcion que devuelva url
-                        <img src="{{ asset('storage/' . $chirp->image) }}" alt="Imagen de Chirp">
+                        <img src="{{ asset( $chirp->image) }}" alt="Imagen de Chirp">
 
                         @endif
                     </div>

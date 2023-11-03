@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use http\Env\Request;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ChirpRequest extends FormRequest
 {
@@ -26,21 +28,13 @@ class ChirpRequest extends FormRequest
             'image' =>  'image|mimes:jpeg,png,jpg,webp|max:11000',
         ];
     }
+     public function saveImage($request)
+     {
+         $path_saved = Storage::putFile('public' , $request->file('image'));
+         $path = 'storage/'.explode("/", $path_saved)[1];
+         return $path;
 
-    // public function saveImage($request) 
-    // {
-    //     if($request->hasFile('upload')){
-    //         $image = base64_encode(file_get_contents($request->file('upload')));
-    //         $request->request->add(['image' => $image]); //add request
-    //     };
-    // }
-    // public function updateImage($request) 
-    // {
-    //     if($request->hasFile('upload')){
-    //         $image = ($request->file('upload'));
-    //         $request->request->add(['image' => $image]); //add request
-    //     };
-    // }
+     }
     public function payload(): array
     {
         return $this->only(['message', 'image']);
