@@ -4,25 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use App\Models\Chirp;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
-use App\Http\Controllers\Log;
 use App\Http\Requests\ChirpRequest;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Avatar;
-
-use function PHPUnit\Framework\isEmpty;
+use App\Http\Service\ChirpService;
 
 class ChirpController extends Controller
 {
+    public function __construct(protected ChirpService $chirpService)
+    {
+    }
     /**
      * Display a listing of the resource.
      */
 
     public function index(): View
     {
-
         return view('chirps.index', [
             'chirps' => Chirp::with('user')->latest()->get(),
         ]);
@@ -41,15 +38,11 @@ class ChirpController extends Controller
      */
     public function store(ChirpRequest $request): RedirectResponse
     {
-
-        $path = null;
-        if($request->hasFile("image" )){
-            $path = $request->saveImage($request);
-        }
-
-        $request->user()->chirps()->create(['message' => $request->input('message'), 'image' => $path]);
-
-
+       $this->chirpService->store(
+            $request->user()->id,
+            $request->validated('message'),
+            $request->validated('image')
+        );
         return redirect(route('chirps.index'));
     }
 
@@ -78,18 +71,13 @@ class ChirpController extends Controller
      */
     public function update(ChirpRequest $request, Chirp $chirp): RedirectResponse
     {
-
         $this->authorize('update', $chirp);
-        $path = null;
-        if($request->hasFile("image" )){
-            $path = $request->saveImage($request);
-            Storage::delete($chirp->image);
-        }
-        $path = $path ?: $chirp->image;
 
-        app('log')->info("Request Captured", $request->all());
-        $chirp->update(['message' => $request->input('message'), 'image' => $path]);
-        // $chirp->update($validated);
+        $this->chirpService->update(
+            $chirp,
+            $request->validated('message'),
+            $request->validated('image')
+        );
 
         return redirect(route('chirps.index'));
     }
@@ -100,10 +88,8 @@ class ChirpController extends Controller
     public function destroy(Chirp $chirp): RedirectResponse
     {
         $this->authorize('delete', $chirp);
-        if($chirp->image){
-            Storage::delete($chirp->image);
-        }
-        $chirp->delete();
+
+        $this->chirpService->destroy($chirp);
 
         return redirect(route('chirps.index'));
     }

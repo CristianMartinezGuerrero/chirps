@@ -56,7 +56,7 @@
                         </div>
                         <p class="mt-4 text-lg text-gray-900">{{ $chirp->message }}</p>
                         @if (!empty($chirp->image))
-                        <img src="{{ asset( $chirp->image) }}" alt="Imagen de Chirp">
+                        <img src="{{ asset( 'storage/'.$chirp->image) }}" alt="Imagen de Chirp">
 
                         @endif
                     </div>

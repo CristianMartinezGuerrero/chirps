@@ -8,7 +8,7 @@
                 class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
             >{{ old('message', $chirp->message) }}</textarea>
             @if (!empty($chirp->image))
-                <img src="{{ asset( $chirp->image) }}" alt="Imagen de Chirp">
+                <img src="{{ asset('storage/'. $chirp->image) }}" alt="Imagen de Chirp">
 
             @endif
             <input type="file" name="image">

@@ -28,13 +28,13 @@ class ChirpRequest extends FormRequest
             'image' =>  'image|mimes:jpeg,png,jpg,webp|max:11000',
         ];
     }
-     public function saveImage($request)
-     {
-         $path_saved = Storage::putFile('public' , $request->file('image'));
-         $path = 'storage/'.explode("/", $path_saved)[1];
-         return $path;
+    //  public function saveImage($request)
+    //  {
+    //      $path_saved = Storage::putFile('public' , $request->file('image'));
+    //      $path = 'storage/'.explode("/", $path_saved)[1];
+    //      return $path;
 
-     }
+    //  }
     public function payload(): array
     {
         return $this->only(['message', 'image']);

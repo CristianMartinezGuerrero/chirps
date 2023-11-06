@@ -10,19 +10,24 @@ use Illuminate\Database\Eloquent\Model;
 class Chirp extends Model
 {
     use HasFactory;
-   
-    
+    private ?string $image;
+
     protected $fillable = [
-        'message', 
+        'user_id',
+        'message',
         'image'
     ];
-    
+
     protected $dispatchesEvents = [
         'created' => ChirpCreated::class,
     ];
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function getImage(): ?string
+    {
+        return $this->image;
     }
 }
