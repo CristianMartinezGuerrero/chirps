@@ -43,10 +43,60 @@ class ChirpService
         }
         $chirp->delete();
     } 
-//    public function deleteImage(Chirp $chirp) : void
-//    {
-//        if($path != null){
-//            Storage::disk("public")->delete($chirp->image);
-//        }
-//    }
+
+    public function getStats(array $chirps) : array {
+
+        $total = $max = $average = 0;
+        $min = 1000;
+
+        if (!empty($chirps)) {
+            foreach ($chirps as $chirp) {
+                $total += $chirp;
+                if ($min > $chirp) {
+                    $min = $chirp;
+                }
+                if ($max < $chirp) {
+                    $max = $chirp;
+                }
+            }
+        }
+
+        $stats = [
+            'max' => $max,
+            'min' => $min,
+            'average' => $total/count($chirps),
+            'total' => $total,
+        ];
+        return $stats;
+    }
+
+    public function getUsersStats(array $statsUsers) : array {
+        
+        $max = $average = $minUser = $maxUser = $averageUser = 0;
+        $min = 1000;
+
+        if (!empty($statsUsers)) {
+            foreach ($statsUsers as $id => $user) {
+                if ($min > $user['min']) {
+                    $min = $user['min'];
+                    $minUser = $id;
+                }
+                if ($max < $user['max']) {
+                    $max = $user['max'];
+                    $maxUser = $id;
+                }
+                if ($average < $user['average']) {
+                    $average = $user['average'];
+                    $averageUser = $id;
+                }
+            }
+        }
+
+        $usersStats = [
+            'maxUser' => $maxUser,
+            'minUser' => $minUser,
+            'averageUser' => $averageUser
+        ];
+        return $usersStats;
+    }
 }

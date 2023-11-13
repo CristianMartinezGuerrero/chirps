@@ -30,4 +30,13 @@ class Chirp extends Model
     {
         return $this->image;
     }
+    public function getMessage(): string 
+    {
+        if (!$this->message) {
+            $cortado = "No message";
+        } else
+            $cortado = substr($this->message, 0, 50);
+        return $cortado;
+        // return $this->message;
+    }
 }
