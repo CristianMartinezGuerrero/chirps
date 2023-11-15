@@ -2,60 +2,91 @@
 
 
 use Illuminate\Support\Facades\Http;
+use App\Http\Service\ApiService;
+use Illuminate\Http\Client\Request;
+
+beforeEach(function() {
+    Http::preventStrayRequests();
+});
 
 test('login', function () {
     // Arrange
+    $data = [
+        "username" => "user", 
+        "password" => "user1234"
+    ];
+    $token = 'token';
+
+    $expectResponse = ['token' => 'asd'];
     Http::fake([
-        'https://api.prezo.info/login' => Http::response(["token" => "randomtokenforuser"]),
+        'https://api.prezo.info/login' => Http::response($expectResponse),
     ]);
 
     // Act
-    $response = Http::post('https://api.prezo.info/login', ["username" => "user", "password" => "user1234"]);
+    $apiService = new ApiService($token);
+    $response = $apiService->prezoLogin($data);
     
     // Assert
-    expect($response->json())
-        ->not->toBeEmpty()
-        ->toBeArray();
+    Http::assertSent(function (Request $request) use ($token) {
+        return $request->method() === 'POST' &&
+            $request->url() == 'https://api.prezo.info/login' &&
+            $request['username'] == 'user' &&
+            $request['password'] == 'user1234';
+    });
+    expect($response)->toMatchArray($expectResponse);
 });
 
 test('restaurants get', function () {
     // Arrange
+    $data = [
+        ["id" => 1, "name" => "Mac Donalds"],
+        ["id" => 2, "name" => "Big Donalds"]
+    ];
+    $token = 'token';
     Http::fake([
-        'https://api.prezo.info/restaurants' => Http::response([
-            ["id" => 1, "name" => "Mac Donalds"],
-            ["id" => 2, "name" => "Big Donalds"]
-        ]),
+        'https://api.prezo.info/restaurants' => Http::response($data),
     ]);
 
     // Act
-    $response = Http::withToken("randomtokenforuser")->get('https://api.prezo.info/restaurants');
+    $apiService = new ApiService($token);
+    $response = $apiService->getRestaurants();
     
     // Assert
-    expect($response->json())
-        ->not->toBeEmpty()
-        ->toBeArray();
+    Http::assertSent(function (Request $request) use ($token) {
+        return $request->hasHeader('Authorization', 'Bearer ' . $token) &&
+            $request->url() == 'https://api.prezo.info/restaurants';
+    });
+    expect($response)->toMatchArray($data);
 });
 
 test('restaurants post', function () {
+    
     // Arrange
-
-    $token = "randomtokenforuser";
+    $data = [
+        'name' => 'Nombre',
+        'address' => 'Somewhere',
+        'nif' => 'b7858755',
+        'phone' => '0739834'
+    ];
+    $expectedArray = array_merge($data, ['id' => 2]);
+    $token = 'token';
 
     Http::fake([
-        'https://api.prezo.info/restaurants' => Http::response([
-            "id" => 2, 
-            "name" => "Nombre", 
-            "address" => "Alguna calle y ciudad", 
-            "nif" => "B66664521", 
-            "phone" => "123456789"
-        ]),
+        'https://api.prezo.info/restaurants' => Http::response($expectedArray),
     ]);
 
     // Act
-    $response = Http::withToken($token)->post('https://api.prezo.info/restaurants');
+    $apiService = new ApiService($token);
+    $response = $apiService->createRestaurant($data);
+
     // Assert
-    
-    expect($response->json())
-        ->not->toBeEmpty()
-        ->toBeArray();
+    Http::assertSent(function (Request $request) {
+        return $request->hasHeader('Authorization', 'Bearer token') &&
+            $request->url() == 'https://api.prezo.info/restaurants' &&
+            $request['name'] == 'Nombre' &&
+            $request['address'] == 'Somewhere'&&
+            $request['nif'] == 'b7858755' &&
+            $request['phone'] == '0739834' ;
+    });
+    expect($response)->toMatchArray($expectedArray);
 });
