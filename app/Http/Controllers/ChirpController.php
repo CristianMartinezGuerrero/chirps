@@ -18,6 +18,14 @@ class ChirpController extends Controller
      * Display a listing of the resource.
      */
 
+    protected $chirpService;
+
+    public function __construct(ChirpService $chirpService)
+    {
+        $this->chirpService = $chirpService;
+    }
+
+
     public function index(): View
     {
         return view('chirps.index', [
@@ -87,6 +95,14 @@ class ChirpController extends Controller
      */
     public function destroy(Chirp $chirp): RedirectResponse
     {
+        // $this->authorize('delete', $chirp);
+        // if($chirp->image){
+        //     Storage::delete($chirp->image);
+        // }
+        // $chirp->delete();
+
+        // return redirect(route('chirps.index'));
+
         $this->authorize('delete', $chirp);
 
         $this->chirpService->destroy($chirp);
